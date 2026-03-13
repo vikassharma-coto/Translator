@@ -1,0 +1,16 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/vikassharma/Desktop/AndroidStudioProjects2026/Trans/feature_translate/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest13272735426708347333.xml:2:13-83
+INJECTED from /Users/vikassharma/Desktop/AndroidStudioProjects2026/Trans/feature_translate/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest13272735426708347333.xml:2:13-83
+	package
+		INJECTED from /Users/vikassharma/Desktop/AndroidStudioProjects2026/Trans/feature_translate/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest13272735426708347333.xml
+	xmlns:android
+		ADDED from /Users/vikassharma/Desktop/AndroidStudioProjects2026/Trans/feature_translate/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest13272735426708347333.xml:2:23-81
+uses-sdk
+INJECTED from /Users/vikassharma/Desktop/AndroidStudioProjects2026/Trans/feature_translate/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest13272735426708347333.xml reason: use-sdk injection requested
+INJECTED from /Users/vikassharma/Desktop/AndroidStudioProjects2026/Trans/feature_translate/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest13272735426708347333.xml
+INJECTED from /Users/vikassharma/Desktop/AndroidStudioProjects2026/Trans/feature_translate/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest13272735426708347333.xml
+	android:targetSdkVersion
+		INJECTED from /Users/vikassharma/Desktop/AndroidStudioProjects2026/Trans/feature_translate/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest13272735426708347333.xml
+	android:minSdkVersion
+		INJECTED from /Users/vikassharma/Desktop/AndroidStudioProjects2026/Trans/feature_translate/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest13272735426708347333.xml
