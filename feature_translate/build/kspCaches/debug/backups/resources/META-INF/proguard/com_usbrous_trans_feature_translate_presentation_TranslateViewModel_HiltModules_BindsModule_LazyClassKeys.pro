@@ -1,1 +1,0 @@
--keep,allowobfuscation,allowshrinking class com.usbrous.trans.feature_translate.presentation.TranslateViewModel
