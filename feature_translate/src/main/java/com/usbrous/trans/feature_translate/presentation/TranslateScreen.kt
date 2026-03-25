@@ -6,20 +6,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -38,7 +27,6 @@ import com.usbrous.trans.feature_translate.presentation.components.rememberCamer
 import com.usbrous.trans.feature_translate.presentation.components.rememberSpeechRecognizer
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TranslateScreen(
     uiState: TranslateUiState,
@@ -84,40 +72,14 @@ fun TranslateScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Translator",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                },
-                actions = {
-                    IconButton(onClick = onNavigateToAbout) {
-                        Icon(
-                            imageVector = Icons.Outlined.Info,
-                            contentDescription = "About",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface
-                )
-            )
-        },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp)
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
-
+            // ── Language selector bar (with purple top accent) ──────────────
             LanguageSelectorBar(
                 sourceLanguage = uiState.sourceLanguage,
                 targetLanguage = uiState.targetLanguage,
@@ -130,8 +92,9 @@ fun TranslateScreen(
                 onSwapClick = { onEvent(TranslateEvent.SwapLanguages) }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
+            // ── Input card ──────────────────────────────────────────────────
             TranslateInputSection(
                 inputText = uiState.inputText,
                 isTranslating = uiState.isTranslating,
@@ -143,18 +106,7 @@ fun TranslateScreen(
                     if (!clipText.isNullOrBlank()) {
                         onEvent(TranslateEvent.PastedText(clipText))
                     } else {
-                        scope.launch {
-                            snackbarHostState.showSnackbar("Clipboard is empty")
-                        }
-                    }
-                },
-                onCopyInputClick = {
-                    if (uiState.inputText.isNotEmpty()) {
-                        performCopyWithHaptic(
-                            label = "Source text",
-                            text = uiState.inputText,
-                            feedbackMessage = "Source text copied"
-                        )
+                        scope.launch { snackbarHostState.showSnackbar("Clipboard is empty") }
                     }
                 },
                 onMicClick = {
@@ -164,7 +116,9 @@ fun TranslateScreen(
                         speechRecognizer.launch(langCode)
                     } else {
                         scope.launch {
-                            snackbarHostState.showSnackbar("Speech recognition is not available on this device")
+                            snackbarHostState.showSnackbar(
+                                "Speech recognition is not available on this device"
+                            )
                         }
                     }
                 },
@@ -173,14 +127,18 @@ fun TranslateScreen(
                         cameraOcr.launch()
                     } else {
                         scope.launch {
-                            snackbarHostState.showSnackbar("Camera is not available on this device")
+                            snackbarHostState.showSnackbar(
+                                "Camera is not available on this device"
+                            )
                         }
                     }
-                }
+                },
+                modifier = Modifier.padding(horizontal = 8.dp)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
+            // ── Output card (fills remaining space) ─────────────────────────
             TranslateOutputSection(
                 translatedText = uiState.translatedText,
                 isLoading = uiState.isTranslating,
@@ -193,16 +151,19 @@ fun TranslateScreen(
                         feedbackMessage = "Translation copied"
                     )
                 },
-                onRetryClick = { onEvent(TranslateEvent.Retry) }
+                onRetryClick = { onEvent(TranslateEvent.Retry) },
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .weight(1f)
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 
+    // ── Language picker bottom sheet ────────────────────────────────────────
     uiState.languagePickerTarget?.let { target ->
         val isSource = target == LanguagePickerTarget.SOURCE
-
         LanguagePickerSheet(
             title = if (isSource) "Translate from" else "Translate to",
             languages = if (isSource) Language.sourceLanguages() else Language.targetLanguages(),

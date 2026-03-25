@@ -7,15 +7,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Warning
@@ -39,9 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
-private enum class OutputState {
-    LOADING, ERROR, CONTENT, EMPTY
-}
+private enum class OutputState { LOADING, ERROR, CONTENT, EMPTY }
 
 @Composable
 fun TranslateOutputSection(
@@ -53,12 +49,12 @@ fun TranslateOutputSection(
     onRetryClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var showCopiedCheck by remember { mutableStateOf(false) }
+    var showCopied by remember { mutableStateOf(false) }
 
-    LaunchedEffect(showCopiedCheck) {
-        if (showCopiedCheck) {
+    LaunchedEffect(showCopied) {
+        if (showCopied) {
             delay(1500)
-            showCopiedCheck = false
+            showCopied = false
         }
     }
 
@@ -72,85 +68,27 @@ fun TranslateOutputSection(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (errorMessage != null && !isLoading)
-                MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
-            else
-                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+            containerColor = MaterialTheme.colorScheme.surface
         ),
-        shape = MaterialTheme.shapes.large
+        shape = MaterialTheme.shapes.large,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+                .fillMaxSize()
+                .animateContentSize()
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Translation",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = if (outputState == OutputState.ERROR)
-                        MaterialTheme.colorScheme.error
-                    else
-                        MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.weight(1f)
-                )
-
-                if (outputState == OutputState.CONTENT) {
-                    IconButton(
-                        onClick = {
-                            onCopyClick()
-                            showCopiedCheck = true
-                        }
-                    ) {
-                        Crossfade(
-                            targetState = showCopiedCheck,
-                            label = "copy_check"
-                        ) { isCopied ->
-                            if (isCopied) {
-                                Icon(
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription = "Copied",
-                                    tint = MaterialTheme.colorScheme.secondary
-                                )
-                            } else {
-                                Icon(
-                                    imageVector = Icons.Default.ContentCopy,
-                                    contentDescription = "Copy translation",
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (isLoading) {
-                Text(
-                    text = "Translating… (may download model on first use)",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 100.dp)
-                    .animateContentSize(),
-                contentAlignment = if (outputState == OutputState.CONTENT)
-                    Alignment.TopStart else Alignment.Center
-            ) {
-                Crossfade(
-                    targetState = outputState,
-                    label = "output_state"
-                ) { state ->
-                    when (state) {
-                        OutputState.LOADING -> {
+            Crossfade(
+                targetState = outputState,
+                label = "output_state",
+                modifier = Modifier.fillMaxSize()
+            ) { state ->
+                when (state) {
+                    OutputState.LOADING -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize().padding(24.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(28.dp),
@@ -160,60 +98,87 @@ fun TranslateOutputSection(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Text(
                                     text = "Translating…",
-                                    style = MaterialTheme.typography.bodyMedium,
+                                    style = MaterialTheme.typography.bodyLarge,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
+                    }
 
-                        OutputState.ERROR -> {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(8.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
+                    OutputState.ERROR -> {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Warning,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(36.dp)
+                            )
+                            Spacer(modifier = Modifier.size(12.dp))
+                            Text(
+                                text = errorMessage ?: "Translation failed",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.error,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.size(16.dp))
+                            OutlinedButton(onClick = onRetryClick) {
                                 Icon(
-                                    imageVector = Icons.Default.Warning,
+                                    imageVector = Icons.Default.Refresh,
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.error,
-                                    modifier = Modifier.size(32.dp)
+                                    modifier = Modifier.size(18.dp)
                                 )
-                                Text(
-                                    text = errorMessage ?: "Translation failed",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.error,
-                                    textAlign = TextAlign.Center
-                                )
-                                OutlinedButton(onClick = onRetryClick) {
-                                    Icon(
-                                        imageVector = Icons.Default.Refresh,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(18.dp)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Retry")
+                            }
+                        }
+                    }
+
+                    OutputState.CONTENT -> {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(20.dp)
+                        ) {
+                            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                                SelectionContainer {
+                                    Text(
+                                        text = translatedText,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text("Retry")
+                                }
+                            }
+                            // Copy button aligned to bottom-end
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                IconButton(
+                                    onClick = {
+                                        onCopyClick()
+                                        showCopied = true
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.ContentCopy,
+                                        contentDescription = "Copy translation",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
                                 }
                             }
                         }
+                    }
 
-                        OutputState.CONTENT -> {
-                            SelectionContainer {
-                                Text(
-                                    text = translatedText,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                        }
-
-                        OutputState.EMPTY -> {
-                            Text(
-                                text = if (hasInput) "Tap send to translate"
-                                else "Translation will appear here",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
-                            )
-                        }
+                    OutputState.EMPTY -> {
+                        // Empty placeholder — matches the blank card in the screenshot
+                        Box(modifier = Modifier.fillMaxSize())
                     }
                 }
             }

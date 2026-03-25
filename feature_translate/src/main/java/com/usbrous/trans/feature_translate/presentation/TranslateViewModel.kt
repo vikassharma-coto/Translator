@@ -7,7 +7,6 @@ import com.usbrous.trans.feature_translate.domain.model.Language
 import com.usbrous.trans.feature_translate.domain.usecase.TranslateTextUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +23,6 @@ class TranslateViewModel @Inject constructor(
     val uiState: StateFlow<TranslateUiState> = _uiState.asStateFlow()
 
     private var translationJob: Job? = null
-    private var debounceJob: Job? = null
 
     fun onEvent(event: TranslateEvent) {
         when (event) {
@@ -32,12 +30,10 @@ class TranslateViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(inputText = event.text, error = null, translationError = null)
                 }
-                debounceTranslate()
             }
 
             is TranslateEvent.ClearInput -> {
                 translationJob?.cancel()
-                debounceJob?.cancel()
                 _uiState.update {
                     it.copy(
                         inputText = "",
@@ -73,12 +69,9 @@ class TranslateViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(inputText = event.text, error = null, translationError = null)
                 }
-                debounceJob?.cancel()
-                translate()
             }
 
             is TranslateEvent.Translate -> {
-                debounceJob?.cancel()
                 translate()
             }
 
@@ -110,14 +103,6 @@ class TranslateViewModel @Inject constructor(
             is TranslateEvent.DismissError -> {
                 _uiState.update { it.copy(error = null) }
             }
-        }
-    }
-
-    private fun debounceTranslate() {
-        debounceJob?.cancel()
-        debounceJob = viewModelScope.launch {
-            delay(DEBOUNCE_DELAY_MS)
-            translate()
         }
     }
 
@@ -244,7 +229,6 @@ class TranslateViewModel @Inject constructor(
     }
 
     companion object {
-        private const val DEBOUNCE_DELAY_MS = 600L
         private const val MAX_RECENT_LANGUAGES = 3
     }
 }
