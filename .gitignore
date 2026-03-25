@@ -1,15 +1,37 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# Built output
+build/
+**/build/
+
+# Gradle
+.gradle/
+**/.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+# Local config (never commit)
 local.properties
+
+# IntelliJ / Android Studio — keep only project-level shared settings
+.idea/*
+!.idea/codeStyles/
+!.idea/copyright/
+!.idea/inspectionProfiles/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Native build artifacts
+.externalNativeBuild/
+.cxx/
+
+# Captures / profiling
+captures/
+
+# Kotlin incremental compilation
+kotlin/
+
+# Claude Code memory (local only)
+.claude/
